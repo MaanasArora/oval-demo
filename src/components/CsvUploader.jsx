@@ -56,8 +56,6 @@ json
       const {embeddings, comments, num_participants, num_votes} = jsonProxy.toJs();
       jsonProxy.destroy();
 
-      console.log(comments);
-
       onLoaded(embeddings, comments, num_participants, num_votes)
     } catch (err) {
       console.error(err);

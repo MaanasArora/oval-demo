@@ -16,7 +16,7 @@ export async function initPyodide() {
   await micropip.install('pydantic');
 
   const urlBase =
-    window.location === 'http://localhost:5173/'
+    window.location.origin === 'http://localhost:5173'
       ? 'http://localhost:5173/oval-demo'
       : 'https://maanasarora.github.io/oval-demo';
 
@@ -42,6 +42,7 @@ variable = Variable(conversation, name=variable_name)
 variable.fit(labels=dict(anchors_dict), ndim=min(len(conversation.comments), 100), relevance_scoring=use_relevance_scoring)
 
 scores = variable.predict_comments([int(c.id) for c in conversation.comments])
+scores = scores / np.abs(np.std(scores))  # Normalize scores for better visualization
 scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}
 
 confidence = variable.score_comments([int(c.id) for c in conversation.comments], dict(anchors_dict))
