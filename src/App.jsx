@@ -15,6 +15,8 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [scores, setScores] = useState(null);
   const [anchors, setAnchors] = useState(new Map());
+  const [numParticipants, setNumParticipants] = useState(0);
+  const [numVotes, setNumVotes] = useState(0);
 
   async function computeVariable({ name, anchors }) {
     const scores = await computeVariablePyodide(name, anchors);
@@ -43,11 +45,13 @@ export default function App() {
     });
   }
 
-  const onConversationLoaded = (embeddings, comments) => {
+  const onConversationLoaded = (embeddings, comments, numParticipants, numVotes) => {
     setEmbeddings(embeddings);
     setComments(comments);
     setLoaded(true);
     setSelectedComment(0);
+    setNumParticipants(numParticipants);
+    setNumVotes(numVotes);
   };
 
   return (
@@ -60,6 +64,8 @@ export default function App() {
         ) : (
           <DatasetPanel
             comments={comments}
+            numParticipants={numParticipants}
+            numVotes={numVotes}
             anchors={anchors}
             onToggleAnchor={toggleAnchor}
           />

@@ -4,6 +4,8 @@ export default function DatasetPanel({
   comments = [],
   anchors = new Set(),
   onToggleAnchor,
+  numParticipants,
+  numVotes,
 }) {
   const [search, setSearch] = useState('');
 
@@ -21,6 +23,14 @@ export default function DatasetPanel({
 
         <div className="text-sm text-gray-500 mt-1">
           {comments.length} comments
+        </div>
+
+        <div className="text-sm text-gray-500 mt-1">
+          {numParticipants} participants
+        </div>
+
+        <div className="text-sm text-gray-500 mt-1">
+          {numVotes} votes
         </div>
 
         {/* Search */}

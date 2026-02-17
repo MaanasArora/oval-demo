@@ -44,13 +44,15 @@ comments_list = [
 json = {
     "embeddings": embeddings.tolist(),
     "comments": comments_list,
+    "num_participants": len(conversation.users),
+    "num_votes": len(conversation.votes_matrix.nonzero()[0]),
 }
 json
 `);
-      const {embeddings, comments} = jsonProxy.toJs();
+      const {embeddings, comments, num_participants, num_votes} = jsonProxy.toJs();
       jsonProxy.destroy();
 
-      onLoaded(embeddings, comments)
+      onLoaded(embeddings, comments, num_participants, num_votes)
     } catch (err) {
       console.error(err);
       alert('Error loading CSVs. Check console.');
