@@ -3,6 +3,25 @@ import Plotly from 'plotly.js-basic-dist';
 import plotComponentFactory from 'react-plotly.js/factory';
 const Plot = plotComponentFactory.default(Plotly);
 
+function wrapText(text, maxLen = 80) {
+  const words = text.split(' ');
+  let lines = [];
+  let line = '';
+
+  for (const word of words) {
+    if ((line + word).length > maxLen) {
+      lines.push(line);
+      line = word;
+    } else {
+      line += (line ? ' ' : '') + word;
+    }
+  }
+
+  if (line) lines.push(line);
+
+  return lines.join('<br>');
+}
+
 export default function ScatterPlot({
   embeddings,
   comments,
@@ -20,9 +39,13 @@ export default function ScatterPlot({
   const x = embeddings.map((e) => e[0]);
   const y = embeddings.map((e) => e[1]);
 
-  const text = comments.map((c) => c.content);
+  const text = comments.map((c) => wrapText(c.content));
 
-  const color = scores || embeddings.map(() => 0);
+  const color = scores
+    ? Object.entries(scores).map(
+        ([id, score]) => (comments.findIndex((c) => c.id === id), score)
+      )
+    : embeddings.map(() => 0);
 
   function handleClick(event) {
     const point = event.points[0];
@@ -44,12 +67,17 @@ export default function ScatterPlot({
             size: 8,
             color,
             colorscale: 'RdBu',
-            showscale: true,
+            showscale: false,
             colorbar: {
               title: 'Score',
             },
           },
-          hovertemplate: '%{text}<extra></extra>',
+          customdata: comments.map((c) => scores?.[c.id] ?? 0),
+          hovertemplate:
+            '<b>Comment</b><br>' +
+            '%{text}<br><br>' +
+            '<b>Score:</b> %{customdata:.2f}' +
+            '<extra></extra>',
         },
       ]}
       layout={{
