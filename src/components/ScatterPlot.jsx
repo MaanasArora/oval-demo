@@ -39,13 +39,9 @@ export default function ScatterPlot({
   const x = embeddings.map((e) => e[0]);
   const y = embeddings.map((e) => e[1]);
 
-  const text = comments.map((c) => wrapText(c.content));
+  const text = comments.map((c) => wrapText(c.content || ''));
 
-  const color = scores
-    ? Object.entries(scores).map(
-        ([id, score]) => (comments.findIndex((c) => c.id === id), score)
-      )
-    : embeddings.map(() => 0);
+  const color = comments.map((c) => scores?.[c.id] ?? 0);
 
   function handleClick(event) {
     const point = event.points[0];
@@ -67,7 +63,8 @@ export default function ScatterPlot({
             size: 8,
             color,
             colorscale: 'RdBu',
-            showscale: false,
+            showscale: true,
+            reversescale: true,
             colorbar: {
               title: 'Score',
             },

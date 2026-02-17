@@ -33,7 +33,7 @@ from oval.variable import Variable
 anchors_dict = {int(k): v for k, v in anchors_json.to_py().items()}
 
 variable = Variable(conversation, name=variable_name)
-variable.fit(labels=dict(anchors_dict), ndim=3)
+variable.fit(labels=dict(anchors_dict), ndim=10)
 
 scores = variable.predict_comments([int(c.id) for c in conversation.comments])
 scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}
