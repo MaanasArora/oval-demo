@@ -26,11 +26,12 @@ export async function initPyodide() {
   return pyodide;
 }
 
-export async function computeVariable(name, anchors) {
+export async function computeVariable(name, anchors, useRelevanceScoring) {
   pyodide = await initPyodide();
 
   pyodide.globals.set('anchors_json', anchors);
   pyodide.globals.set('variable_name', name);
+  pyodide.globals.set('use_relevance_scoring', useRelevanceScoring);
 
   const result = await pyodide.runPythonAsync(`
 from oval.variable import Variable
@@ -38,7 +39,7 @@ from oval.variable import Variable
 anchors_dict = {int(k): v for k, v in anchors_json.to_py().items()}
 
 variable = Variable(conversation, name=variable_name)
-variable.fit(labels=dict(anchors_dict), ndim=min(len(conversation.comments), 100))
+variable.fit(labels=dict(anchors_dict), ndim=min(len(conversation.comments), 100), relevance_scoring=use_relevance_scoring)
 
 scores = variable.predict_comments([int(c.id) for c in conversation.comments])
 scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}

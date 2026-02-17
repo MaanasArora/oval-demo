@@ -9,6 +9,7 @@ export default function VariablePanel({
 }) {
   const [name, setName] = useState('New Variable');
   const [loading, setLoading] = useState(false);
+  const [relevanceScoring, setRelevanceScoring] = useState(false);
 
   async function handleCompute() {
     const anchorsWithRatings = Array.from(anchors.entries());
@@ -18,6 +19,7 @@ export default function VariablePanel({
     await onCompute({
       name,
       anchors: Object.fromEntries(anchorsWithRatings),
+      relevanceScoring,
     });
 
     setLoading(false);
@@ -36,6 +38,18 @@ export default function VariablePanel({
           onChange={(e) => setName(e.target.value)}
           className="mt-3 w-full border rounded px-2 py-1"
         />
+
+        <input
+          type="checkbox"
+          id="relevance"
+          name="relevance"
+          className="mt-3"
+          checked={relevanceScoring}
+          onChange={(e) => setRelevanceScoring(e.target.checked)}
+        />
+        <label htmlFor="relevance" className="ml-2 text-sm text-gray-600">
+          Use relevance scoring
+        </label>
       </div>
 
       {/* Anchor list */}

@@ -19,8 +19,8 @@ export default function App() {
   const [numParticipants, setNumParticipants] = useState(0);
   const [numVotes, setNumVotes] = useState(0);
 
-  async function computeVariable({ name, anchors }) {
-    const { scores, confidence } = await computeVariablePyodide(name, anchors);
+  async function computeVariable({ name, anchors, relevanceScoring }) {
+    const { scores, confidence } = await computeVariablePyodide(name, anchors, relevanceScoring);
 
     setScores(scores);
     setConfidence(confidence);
