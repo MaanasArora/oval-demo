@@ -16,7 +16,7 @@ function ScoreBar({ score, maxScore }) {
   );
 }
 
-export default function ScoreExplorer({ comments, scores, onSelectComment }) {
+export default function ScoreExplorer({ comments, scores, onSelectComment, onBack }) {
   const [sortOrder, setSortOrder] = useState('desc');
 
   if (!scores) {
@@ -43,6 +43,9 @@ export default function ScoreExplorer({ comments, scores, onSelectComment }) {
     <div className="w-80 bg-white border-l flex flex-col">
       {/* Header */}
       <div className="p-4 border-b">
+        <div onClick={onBack} className="text-sm text-blue-600 cursor-pointer mb-2">
+          ← Back to Variable
+        </div>
         <div className="font-semibold mb-2">Explore Variable</div>
 
         <button

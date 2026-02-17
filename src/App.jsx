@@ -83,6 +83,7 @@ export default function App() {
             comments={comments}
             scores={scores}
             onSelectComment={setSelectedComment}
+            onBack={() => setScores(null)}
           />
         ) : (
           <VariablePanel
