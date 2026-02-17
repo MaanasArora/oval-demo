@@ -16,7 +16,7 @@ export async function initPyodide() {
   await micropip.install('pydantic');
 
   // Load your Oval library
-  await micropip.install('http://localhost:5173/oval-0.1.0-py3-none-any.whl');
+  await micropip.install('https://maanasarora.github.io/oval-demo/oval-0.1.0-py3-none-any.whl');
 
   return pyodide;
 }
