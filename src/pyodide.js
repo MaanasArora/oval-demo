@@ -33,11 +33,18 @@ from oval.variable import Variable
 anchors_dict = {int(k): v for k, v in anchors_json.to_py().items()}
 
 variable = Variable(conversation, name=variable_name)
-variable.fit(labels=dict(anchors_dict), ndim=10)
+variable.fit(labels=dict(anchors_dict), ndim=8)
 
 scores = variable.predict_comments([int(c.id) for c in conversation.comments])
 scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}
-scores
+
+confidence = variable.score_comments([int(c.id) for c in conversation.comments], dict(anchors_dict))
+
+json = {
+    "scores": scores,
+    "confidence": confidence,
+}
+json
 `);
 
   return result.toJs();

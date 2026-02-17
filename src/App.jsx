@@ -14,14 +14,16 @@ export default function App() {
   const [selectedComment, setSelectedComment] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [scores, setScores] = useState(null);
+  const [confidence, setConfidence] = useState(null);
   const [anchors, setAnchors] = useState(new Map());
   const [numParticipants, setNumParticipants] = useState(0);
   const [numVotes, setNumVotes] = useState(0);
 
   async function computeVariable({ name, anchors }) {
-    const scores = await computeVariablePyodide(name, anchors);
+    const { scores, confidence } = await computeVariablePyodide(name, anchors);
 
     setScores(scores);
+    setConfidence(confidence);
   }
 
   function toggleAnchor(commentId) {
@@ -45,7 +47,12 @@ export default function App() {
     });
   }
 
-  const onConversationLoaded = (embeddings, comments, numParticipants, numVotes) => {
+  const onConversationLoaded = (
+    embeddings,
+    comments,
+    numParticipants,
+    numVotes
+  ) => {
     setEmbeddings(embeddings);
     setComments(comments);
     setLoaded(true);
@@ -82,6 +89,7 @@ export default function App() {
           <ScoreExplorer
             comments={comments}
             scores={scores}
+            confidence={confidence}
             onSelectComment={setSelectedComment}
             onBack={() => setScores(null)}
           />
