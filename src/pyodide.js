@@ -36,6 +36,7 @@ variable = Variable(conversation, name=variable_name)
 variable.fit(labels=dict(anchors_dict), ndim=3)
 
 scores = variable.predict_comments([int(c.id) for c in conversation.comments])
+scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}
 scores
 `);
 
