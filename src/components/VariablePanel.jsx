@@ -13,11 +13,6 @@ export default function VariablePanel({
   async function handleCompute() {
     const anchorsWithRatings = Array.from(anchors.entries());
 
-    if (anchorsWithRatings.length < 2) {
-      alert('Need at least 2 anchors');
-      return;
-    }
-
     setLoading(true);
 
     await onCompute({

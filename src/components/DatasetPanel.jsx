@@ -9,11 +9,17 @@ export default function DatasetPanel({
 }) {
   const [search, setSearch] = useState('');
 
+  const commentsSortedByVotes = useMemo(() => {
+    return [...comments].sort((a, b) => b.vote_proportion - a.vote_proportion);
+  });
+
   const filteredComments = useMemo(() => {
-    if (!search) return comments;
+    if (!search) return commentsSortedByVotes;
     const s = search.toLowerCase();
-    return comments.filter((c) => c.content.toLowerCase().includes(s));
-  }, [comments, search]);
+    return commentsSortedByVotes.filter((c) =>
+      c.content.toLowerCase().includes(s)
+    );
+  }, [commentsSortedByVotes, search]);
 
   return (
     <div className="w-72 bg-white border-r flex flex-col">
@@ -29,9 +35,7 @@ export default function DatasetPanel({
           {numParticipants} participants
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">
-          {numVotes} votes
-        </div>
+        <div className="text-sm text-gray-500 mt-1">{numVotes} votes</div>
 
         {/* Search */}
         <input
@@ -67,7 +71,7 @@ export default function DatasetPanel({
 
                 ${selected ? 'bg-blue-50 border-blue-200' : ''}
               `}>
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-2 mb-2">
                 {/* Checkbox */}
                 <input
                   type="checkbox"
@@ -77,8 +81,17 @@ export default function DatasetPanel({
                 />
 
                 {/* Content */}
-                <div className="text-sm text-gray-800 line-clamp-3">
-                  {comment.content}
+                <div>
+                  <div className="text-sm text-gray-800 line-clamp-4 mb-2">
+                    {comment.content}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Voted by{' '}
+                    <strong>
+                      {Math.round(comment.vote_proportion * 100)}%
+                    </strong>{' '}
+                    of participants
+                  </div>
                 </div>
               </div>
             </div>

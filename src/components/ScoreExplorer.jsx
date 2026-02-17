@@ -56,10 +56,6 @@ export default function ScoreExplorer({
         </div>
         <div className="font-semibold mb-2">Explore Variable</div>
 
-        <div className="p-2 bg-yellow-100 rounded text-base mb-4">
-          Confidence: {confidence.toFixed(2)} / 1.00
-        </div>
-
         <button
           onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
           className="

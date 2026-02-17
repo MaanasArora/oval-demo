@@ -23,6 +23,7 @@ export default function CsvUploader({ onLoaded }) {
 
       // Load conversation
       const jsonProxy = await pyodide.runPythonAsync(`
+import numpy as np
 from oval.io import read_polis
 from oval.decomposition import decompose_votes
 
@@ -37,8 +38,11 @@ comments_list = [
     {
         "id": comment.id,
         "content": comment.content,
+        "vote_proportion": np.array(
+          np.isnan(conversation.votes_matrix[:, i]), dtype=float
+        ).mean(),
     }
-    for comment in conversation.comments
+    for i, comment in enumerate(conversation.comments)
 ]
 
 json = {
@@ -51,6 +55,8 @@ json
 `);
       const {embeddings, comments, num_participants, num_votes} = jsonProxy.toJs();
       jsonProxy.destroy();
+
+      console.log(comments);
 
       onLoaded(embeddings, comments, num_participants, num_votes)
     } catch (err) {
