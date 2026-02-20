@@ -38,9 +38,7 @@ export default function ScatterPlot({
 
   const x = embeddings.map((e) => e[0]);
   const y = embeddings.map((e) => e[1]);
-
   const text = comments.map((c) => wrapText(c.content || ''));
-
   const color = comments.map((c) => scores?.[c.id] ?? 0);
 
   function handleClick(event) {

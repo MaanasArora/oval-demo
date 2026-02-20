@@ -32,7 +32,7 @@ conversation = read_polis(
     "/votes.csv",
 )
 
-embeddings, _ = decompose_votes(conversation.votes_matrix.transpose(), num_components=20)
+embeddings, _ = decompose_votes(conversation.votes_matrix.transpose(), num_components=2)
 
 comments_list = [
     {

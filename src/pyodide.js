@@ -34,18 +34,17 @@ export async function computeVariable(name, anchors, useRelevanceScoring) {
   pyodide.globals.set('use_relevance_scoring', useRelevanceScoring);
 
   const result = await pyodide.runPythonAsync(`
-from oval.variable import Variable
+from oval.variable import DiffusionVariable
 
 anchors_dict = {int(k): v for k, v in anchors_json.to_py().items()}
 
-variable = Variable(conversation, name=variable_name)
-variable.fit(labels=dict(anchors_dict), ndim=min(len(conversation.comments), 100), relevance_scoring=use_relevance_scoring)
+variable = DiffusionVariable(conversation)
+variable.fit(dict(anchors_dict))
 
 scores = variable.predict_comments([int(c.id) for c in conversation.comments])
-scores = scores / np.abs(np.std(scores))  # Normalize scores for better visualization
 scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}
 
-confidence = variable.score_comments([int(c.id) for c in conversation.comments], dict(anchors_dict))
+confidence = variable.score_comments(dict(anchors_dict))
 
 json = {
     "scores": scores,
