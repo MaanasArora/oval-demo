@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { initPyodide, pyodide } from '../pyodide';
-import { loadH5adFile, toCSVBlobs } from '../lib/h5adLoader';
+import { loadH5adFile } from '../lib/h5adLoader';
 
 export default function CsvUploader({ onLoaded }) {
   const [format, setFormat] = useState('csv'); // 'csv' | 'h5ad'
@@ -18,20 +18,60 @@ export default function CsvUploader({ onLoaded }) {
     try {
       await initPyodide();
 
+      let jsonProxy;
+
       if (format === 'h5ad') {
         const buffer = await h5adFile.arrayBuffer();
         const parsed = await loadH5adFile(buffer);
-        const { commentsBlob, votesBlob } = toCSVBlobs(parsed);
-        pyodide.FS.writeFile('/comments.csv', new Uint8Array(await commentsBlob.arrayBuffer()));
-        pyodide.FS.writeFile('/votes.csv', new Uint8Array(await votesBlob.arrayBuffer()));
+
+        // Pass parsed data to Pyodide — bypass read_polis() which requires author-id
+        pyodide.globals.set('_h5ad_comment_texts', parsed.comments.map(c => c.body));
+        pyodide.globals.set('_h5ad_n_obs', parsed.participantIds.length);
+        pyodide.globals.set('_h5ad_n_var', parsed.commentIds.length);
+        pyodide.globals.set('_h5ad_votes_flat', parsed.votesMatrix.flat().map(v => v === null ? NaN : v));
+
+        jsonProxy = await pyodide.runPythonAsync(`
+import numpy as np
+from oval.conversation import Conversation, Comment, User
+from oval.decomposition import decompose_votes
+
+comment_texts = list(_h5ad_comment_texts)
+n_obs = int(_h5ad_n_obs)
+n_var = int(_h5ad_n_var)
+
+users = [User(id=i) for i in range(n_obs)]
+comments = [Comment(id=i, author=users[0], content=str(comment_texts[i])) for i in range(n_var)]
+votes_matrix = np.array(list(_h5ad_votes_flat), dtype=float).reshape(n_obs, n_var)
+conversation = Conversation(comments=comments, users=users, votes_matrix=votes_matrix)
+
+embeddings, _ = decompose_votes(conversation.votes_matrix.transpose(), num_components=2)
+
+comments_list = [
+    {
+        "id": comment.id,
+        "content": comment.content,
+        "vote_proportion": np.array(
+          np.isnan(conversation.votes_matrix[:, i]), dtype=float
+        ).mean(),
+    }
+    for i, comment in enumerate(conversation.comments)
+]
+
+json = {
+    "embeddings": embeddings.tolist(),
+    "comments": comments_list,
+    "num_participants": len(conversation.users),
+    "num_votes": len(conversation.votes_matrix.nonzero()[0]),
+}
+json
+`);
       } else {
         const commentsBuffer = await commentsFile.arrayBuffer();
         pyodide.FS.writeFile('/comments.csv', new Uint8Array(commentsBuffer));
         const votesBuffer = await votesFile.arrayBuffer();
         pyodide.FS.writeFile('/votes.csv', new Uint8Array(votesBuffer));
-      }
 
-      const jsonProxy = await pyodide.runPythonAsync(`
+        jsonProxy = await pyodide.runPythonAsync(`
 import numpy as np
 from oval.io import read_polis
 from oval.decomposition import decompose_votes
@@ -62,6 +102,7 @@ json = {
 }
 json
 `);
+      }
       const {embeddings, comments, num_participants, num_votes} = jsonProxy.toJs();
       jsonProxy.destroy();
 
