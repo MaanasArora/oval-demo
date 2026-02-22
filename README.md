@@ -1,16 +1,31 @@
-# React + Vite
+# Oval: Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Link to demo**: https://maanasarora.github.io/oval-demo/
+**Library repo**: https://github.com/MaanasArora/oval 
 
-Currently, two official plugins are available:
+## Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Oval is a tool for the analysis of [Pol.is](https://pol.is/)-like data using human-annotated labels.
 
-## React Compiler
+Pol.is provides tools to understand crowdsourced opinion data (participant-provided comments and votes on these comments). It can extract points of consensus and divergence and identify major groups of participants based on voting patterns. These data can be hard to interpret: points of disagreement are described by the comments that produced them, and groups are described by their voting patterns on comments. (See https://patcon.github.io/valency-anndata/ for further reading.)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Oval adds a layer on top of this analysis. To investigate a Pol.is conversation, experts and analysts can define a variable (value or inclination) of interest that varies by participants. Then they find "proxy" comments that represent this value (or its antithesis) particularly well ("anchors"). Oval can use these annotated anchors to approximate this value over all comments and participants. Of course, as only vote structure is used, these values can only be reliably approximated as far as the coalition structure of the conversation (voting patterns) represent them.
 
-## Expanding the ESLint configuration
+This work is being actively investigated. Check back later for more insights!
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## How to use
+
+1. Import a Pol.is conversation.
+   - Download a Pol.is conversation archive from its report page. In particular, download the `participant-votes.csv` and `comments.csv`.
+   - Use the buttons on the left-hand side of this demo to import these files.
+2. Define a variable of interest.
+   - This can be a value or a general inclination that is measured across participants.
+3. Find anchors.
+   - Use the dataset view on the left-hand side to search or explore relevant 'proxy' comments, and select them.
+4. Rate anchors.
+   - Rate the relevant comments from -2 to 2. (-2: very low, 2: very high)
+5. Compute the variable and explore scores.
+
+## Contributing
+
+This repo is open to contributions! If you are interested in this space, please consider introducing yourself in the Discussions.
