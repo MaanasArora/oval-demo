@@ -22,10 +22,10 @@ function wrapText(text, maxLen = 80) {
   return lines.join('<br>');
 }
 
-export default function ScatterPlot({
+export function CommentScatterPlot({
   embeddings,
   comments,
-  scores,
+  commentScores,
   onSelectComment,
 }) {
   if (!embeddings || embeddings.length === 0) {
@@ -39,7 +39,7 @@ export default function ScatterPlot({
   const x = embeddings.map((e) => e[0]);
   const y = embeddings.map((e) => e[1]);
   const text = comments.map((c) => wrapText(c.content || ''));
-  const color = comments.map((c) => scores?.[c.id] ?? 0);
+  const color = comments.map((c) => commentScores?.[c.id] ?? 0);
 
   function handleClick(event) {
     const point = event.points[0];
@@ -67,9 +67,88 @@ export default function ScatterPlot({
               title: 'Score',
             },
           },
-          customdata: comments.map((c) => scores?.[c.id] ?? 0),
+          customdata: comments.map((c) => commentScores?.[c.id] ?? 0),
           hovertemplate:
             '<b>Comment</b><br>' +
+            '%{text}<br><br>' +
+            '<b>Score:</b> %{customdata:.2f}' +
+            '<extra></extra>',
+        },
+      ]}
+      layout={{
+        autosize: true,
+        margin: {
+          l: 40,
+          r: 10,
+          t: 10,
+          b: 40,
+        },
+        xaxis: {
+          title: 'Dimension 1',
+        },
+        yaxis: {
+          title: 'Dimension 2',
+        },
+      }}
+      style={{
+        width: '100%',
+        height: '100%',
+      }}
+      useResizeHandler={true}
+      onClick={handleClick}
+    />
+  );
+}
+
+export function ParticipantScatterPlot({
+  embeddings,
+  participants,
+  participantScores,
+  onSelectParticipant,
+}) {
+  if (!embeddings || embeddings.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-400 h-full">
+        No data loaded
+      </div>
+    );
+  }
+
+  console.log(participantScores);
+
+  const x = embeddings.map((e) => e[0]);
+  const y = embeddings.map((e) => e[1]);
+  const text = participants.map((p) => p.name);
+  const color = participants.map((p) => participantScores?.[p.id] ?? 0);
+
+  function handleClick(event) {
+    const point = event.points[0];
+    const index = point.pointIndex;
+
+    onSelectParticipant(index);
+  }
+
+  return (
+    <Plot
+      data={[
+        {
+          x,
+          y,
+          text,
+          mode: 'markers',
+          type: 'scattergl',
+          marker: {
+            size: 8,
+            color,
+            colorscale: 'RdBu',
+            showscale: true,
+            colorbar: {
+              title: 'Score',
+            },
+          },
+          customdata: participants.map((p) => participantScores?.[p.id] ?? 0),
+          hovertemplate:
+            '<b>Participant</b><br>' +
             '%{text}<br><br>' +
             '<b>Score:</b> %{customdata:.2f}' +
             '<extra></extra>',

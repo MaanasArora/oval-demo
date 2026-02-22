@@ -19,13 +19,13 @@ function ScoreBar({ score, maxScore }) {
 export default function ScoreExplorer({
   comments,
   confidence,
-  scores,
+  commentScores,
   onSelectComment,
   onBack,
 }) {
   const [sortOrder, setSortOrder] = useState('desc');
 
-  if (!scores) {
+  if (!commentScores) {
     return (
       <div className="w-80 bg-white border-l p-4">
         <div className="text-gray-400 text-sm">No scores yet</div>
@@ -37,7 +37,7 @@ export default function ScoreExplorer({
     .map((comment) => ({
       ...comment,
 
-      score: scores[comment.id],
+      score: commentScores[comment.id],
     }))
     .sort((a, b) =>
       sortOrder === 'desc' ? b.score - a.score : a.score - b.score

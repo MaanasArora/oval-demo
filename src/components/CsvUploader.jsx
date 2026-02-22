@@ -32,7 +32,8 @@ conversation = read_polis(
     "/votes.csv",
 )
 
-embeddings, _ = decompose_votes(conversation.votes_matrix.transpose(), num_components=2)
+comment_embeddings, _ = decompose_votes(conversation.votes_matrix.transpose(), num_components=2)
+participant_embeddings, _ = decompose_votes(conversation.votes_matrix, num_components=2)
 
 comments_list = [
     {
@@ -45,18 +46,42 @@ comments_list = [
     for i, comment in enumerate(conversation.comments)
 ]
 
+participants_list = [
+    {
+        "id": participant.id,
+        "num_votes": np.count_nonzero(conversation.votes_matrix[i, :]),
+    }
+    for i, participant in enumerate(conversation.users)
+]
+
 json = {
-    "embeddings": embeddings.tolist(),
+    "comment_embeddings": comment_embeddings.tolist(),
+    "participant_embeddings": participant_embeddings.tolist(),
     "comments": comments_list,
+    "participants": participants_list,
     "num_participants": len(conversation.users),
     "num_votes": len(conversation.votes_matrix.nonzero()[0]),
 }
 json
 `);
-      const {embeddings, comments, num_participants, num_votes} = jsonProxy.toJs();
+      const {
+        comment_embeddings,
+        participant_embeddings,
+        comments,
+        participants,
+        num_participants,
+        num_votes,
+      } = jsonProxy.toJs();
       jsonProxy.destroy();
 
-      onLoaded(embeddings, comments, num_participants, num_votes)
+      onLoaded(
+        comment_embeddings,
+        participant_embeddings,
+        comments,
+        participants,
+        num_participants,
+        num_votes
+      );
     } catch (err) {
       console.error(err);
       alert('Error loading CSVs. Check console.');

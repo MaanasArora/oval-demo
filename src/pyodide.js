@@ -41,13 +41,18 @@ anchors_dict = {int(k): v for k, v in anchors_json.to_py().items()}
 variable = DiffusionVariable(conversation)
 variable.fit(dict(anchors_dict))
 
-scores = variable.predict_comments([int(c.id) for c in conversation.comments])
-scores = {comment_id: float(score) for comment_id, score in zip([comment.id for comment in conversation.comments], scores)}
+participant_scores = variable.predict_users().astype(float)
+participant_scores = {int(participant.id): score for participant, score in zip(conversation.users, participant_scores)}
+
+comment_scores = variable.predict_comments().astype(float)
+comment_scores = {int(comment.id): score for comment, score in zip(conversation.comments, comment_scores)}
 
 confidence = variable.score_comments(dict(anchors_dict))
+confidence = float(confidence)
 
 json = {
-    "scores": scores,
+    "comment_scores": comment_scores,
+    "participant_scores": participant_scores,
     "confidence": confidence,
 }
 json
