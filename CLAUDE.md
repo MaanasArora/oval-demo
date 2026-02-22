@@ -27,9 +27,16 @@ App (central state)
 └── Right: VariablePanel (pre-score) | ScoreExplorer (post-score)
 ```
 
+### Input Formats
+
+`CsvUploader` supports two formats selected via a toggle:
+
+- **CSV** (default): `comments.csv` + `participant-votes.csv` — written to the Pyodide WASM filesystem and loaded via `oval.io.read_polis()`
+- **h5ad**: A single `.h5ad` file — parsed in JS by `src/lib/h5adLoader.js` (using `h5wasm`), then passed to Pyodide as raw arrays via `pyodide.globals`. This path bypasses `read_polis()` and builds a `Conversation` object directly (because h5ad files lack the `author-id` field that `read_polis` requires).
+
 ### Data Flow
 
-1. **Load**: User uploads `comments.csv` + `participant-votes.csv` → `CsvUploader` passes buffers to Pyodide → Python reads with `oval.io.read_polis()`, computes 2D embeddings via `oval.decomposition.decompose_votes()` → embeddings + comments + metadata returned to `App` state.
+1. **Load**: User uploads files → `CsvUploader` parses (CSV path: via Pyodide FS + `read_polis`; h5ad path: via `h5adLoader.js` + direct `Conversation` construction in Python) → computes 2D embeddings via `oval.decomposition.decompose_votes()` → embeddings + comments + metadata returned to `App` state.
 
 2. **Variable creation**: User selects "anchor" comments in `DatasetPanel` and rates them (-2 to +2) in `VariablePanel` → `App.computeVariable()` calls `computeVariablePyodide()` in `src/pyodide.js` → Python creates `DiffusionVariable`, fits on anchor ratings, predicts scores for all comments.
 
@@ -45,6 +52,13 @@ Python runs via [Pyodide](https://pyodide.org) (WASM). The module handles:
 - Executing Python code strings and returning results
 
 The wheel URL is resolved dynamically — `localhost` dev vs. GitHub Pages deployment (base path `/oval-demo/`).
+
+### h5ad Loading (`src/lib/h5adLoader.js`)
+
+Reads `.h5ad` files using `h5wasm` (browser-native HDF5). Key details:
+- `loadH5adFile(buffer)` — reads `/obs` (participants), `/var` (comments + text from `content` or `txt` column), and `/X` (votes matrix). Returns `{ comments, participantIds, commentIds, votesMatrix }`.
+- Handles both plain datasets and categorical columns (codes + categories groups).
+- The `toCSVBlobs()` export was removed; h5ad data is now passed directly to Pyodide via `pyodide.globals` rather than being round-tripped through CSV.
 
 ### Key Python APIs (from the `oval` library)
 
