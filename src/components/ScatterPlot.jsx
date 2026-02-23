@@ -60,7 +60,7 @@ export function CommentScatterPlot({
           marker: {
             size: 8,
             color,
-            colorscale: 'RdBu',
+            colorscale: 'Viridis',
             showscale: true,
             reversescale: true,
             colorbar: {
@@ -114,8 +114,6 @@ export function ParticipantScatterPlot({
     );
   }
 
-  console.log(participantScores);
-
   const x = embeddings.map((e) => e[0]);
   const y = embeddings.map((e) => e[1]);
   const text = participants.map((p) => p.name);
@@ -140,7 +138,7 @@ export function ParticipantScatterPlot({
           marker: {
             size: 8,
             color,
-            colorscale: 'RdBu',
+            colorscale: 'Viridis',
             showscale: true,
             colorbar: {
               title: 'Score',
