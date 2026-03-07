@@ -25,10 +25,16 @@ export default function CsvUploader({ onLoaded }) {
         const parsed = await loadH5adFile(buffer);
 
         // Pass parsed data to Pyodide — bypass read_polis() which requires author-id
-        pyodide.globals.set('_h5ad_comment_texts', parsed.comments.map(c => c.body));
+        pyodide.globals.set(
+          '_h5ad_comment_texts',
+          parsed.comments.map((c) => c.body)
+        );
         pyodide.globals.set('_h5ad_n_obs', parsed.participantIds.length);
         pyodide.globals.set('_h5ad_n_var', parsed.commentIds.length);
-        pyodide.globals.set('_h5ad_votes_flat', parsed.votesMatrix.flat().map(v => v === null ? NaN : v));
+        pyodide.globals.set(
+          '_h5ad_votes_flat',
+          parsed.votesMatrix.flat().map((v) => (v === null ? NaN : v))
+        );
 
         jsonProxy = await pyodide.runPythonAsync(`
 import numpy as np
@@ -113,6 +119,8 @@ json = {
 }
 json
 `);
+      }
+
       const {
         comment_embeddings,
         participant_embeddings,
@@ -170,7 +178,9 @@ json
       {format === 'csv' ? (
         <>
           <label className={fileInputClass}>
-            {commentsFile ? commentsFile.name : 'Drag or click to upload comments.csv'}
+            {commentsFile
+              ? commentsFile.name
+              : 'Drag or click to upload comments.csv'}
             <input
               type="file"
               accept=".csv"
@@ -180,7 +190,9 @@ json
           </label>
 
           <label className={fileInputClass}>
-            {votesFile ? votesFile.name : 'Drag or click to upload participant-votes.csv'}
+            {votesFile
+              ? votesFile.name
+              : 'Drag or click to upload participant-votes.csv'}
             <input
               type="file"
               accept=".csv"
